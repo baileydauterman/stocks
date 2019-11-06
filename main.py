@@ -4,22 +4,16 @@ import time
 from bs4 import BeautifulSoup
 from terminaltables import AsciiTable
 
-def get_price(ticker):
-    url = "https://finance.yahoo.com/quote/{}".format(ticker)
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
-    span = soup.findAll('span')
-    price = str(span[13]).split(">")[1].split("<")[0]
-    change = str(span[14]).split(">")[1].split("<")[0]
-    print(f"{ticker} \nPrice: {price} \nChange:{change}")
-
-def get_value(ticker):
+def get_stock(ticker):
     url = "https://finance.yahoo.com/quote/{}".format(ticker)
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
     span = soup.findAll('span')
     td = soup.find_all('td')
-
+    price = str(span[13]).split(">")[1].split("<")[0]
+    change = str(span[14]).split(">")[1].split("<")[0]
+    print(f"{ticker} \nPrice: {price} \nChange:{change}\n\n\n")
+    
     prev_close = str(span[18]).split(">")[1].split("<")[0]
     prev_close_price = str(span[19]).split(">")[1].split("<")[0]
 
