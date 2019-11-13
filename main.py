@@ -25,6 +25,9 @@ def get_valuation(ticker):
 def get_movers():
     daily_gainers()
     daily_losers()
+    
+def get_esg(ticker):
+    esg(ticker)
 
 def get_key_stats():
     key_stats()
@@ -163,7 +166,45 @@ def current_stock_summary(ticker):
         ]
         table = AsciiTable(table_date)
         print(table.table)
+        
+def esg(ticker):
+    url = "https://finance.yahoo.com/quote/{}/sustainability".format(ticker)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    span = soup.findAll('span')
+    div = soup.find_all('div')
 
+    if len(span) < 50:
+        print(f"{ticker} has no sustainability data on Yahoo Finance")
+    else:
+        performance = str(span[17]).split(">")[1].split("<")[0]
+        print(f"\n\n{ticker}: {performance}\n\n")
+
+        total_esg = "Total ESG Score"
+        total_esg_score = str(div[66]).split(">")[1].split("<")[0]
+        total_esg_percentile = str(span[16]).split(">")[1].split("<")[0]
+
+        environmental = "Environment"
+        enviro_esg_score = str(div[76]).split(">")[1].split("<")[0]
+        enviro_esg_percentile = str(span[21]).split(">")[1].split("<")[0]
+
+        social = "Social"
+        social_esg_score = str(div[83]).split(">")[1].split("<")[0]
+        social_esg_percentile = str(span[24]).split(">")[1].split("<")[0]
+
+        gov = "Governance"
+        gov_esg_score = str(div[90]).split(">")[1].split("<")[0]
+        gov_esg_percentile = str(span[27]).split(">")[1].split("<")[0]
+        
+        table_date = [
+            ['Indicator', 'Score','Percentile'],
+            [total_esg,total_esg_score,total_esg_percentile],
+            [environmental,enviro_esg_score,enviro_esg_percentile],
+            [social,social_esg_score,social_esg_percentile],
+            [gov,gov_esg_score,gov_esg_percentile]
+        ]
+        table = AsciiTable(table_date)
+        print(table.table)
 
 def current_stock_statistics(ticker):
     url = "https://finance.yahoo.com/quote/{}/key-statistics?p={}".format(ticker, ticker)
