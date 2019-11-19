@@ -1,6 +1,7 @@
 import requests
 import urllib.request
 import time
+import numbers
 from bs4 import BeautifulSoup
 from terminaltables import AsciiTable
 from datetime import datetime
@@ -173,12 +174,17 @@ def esg(ticker):
     soup = BeautifulSoup(response.text, "html.parser")
     span = soup.findAll('span')
     div = soup.find_all('div')
+    h1 = soup.find_all('h1')
+    h1 = str(h1[0]).split(">")[1].split("<")[0]
+    h1 = h1.split("- ")[1]
+    print(h1)
 
     if len(span) < 50:
         print(f"{ticker} has no sustainability data on Yahoo Finance")
     else:
         performance = str(span[17]).split(">")[1].split("<")[0]
-        print(f"\n\n{ticker}: {performance}\n\n")
+        print(f"Yahoo Finance ESG\n{ticker}: {performance}\n\n")
+        print("Companies are compared on a national level")
 
         total_esg = "Total ESG Score"
         total_esg_score = str(div[66]).split(">")[1].split("<")[0]
@@ -205,6 +211,26 @@ def esg(ticker):
         ]
         table = AsciiTable(table_date)
         print(table.table)
+    
+    url = "https://www.csrhub.com/search/name/{}".format(h1)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    a = soup.findAll('a')
+    a = str(a[29]).split('href="')[1].split('"')[0]
+    
+    
+    url = "https://www.csrhub.com/{}".format(a)
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    span = soup.find_all('span')
+    span = str(span[10]).split(">")[1].split("<")[0]
+    if not isinstance(span, numbers.Integral):
+        print("\n\nCSRHub does not have the correct information for the CSR and ESG score")
+    else:
+        print("\n\nCSRHub")
+        print("CSR & ESG Score")
+        print(f"\n{span} CSR / ESG Ranking Compared With 17,989 Companies")
+    
 
 def current_stock_statistics(ticker):
     url = "https://finance.yahoo.com/quote/{}/key-statistics?p={}".format(ticker, ticker)
